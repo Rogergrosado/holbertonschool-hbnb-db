@@ -1,30 +1,22 @@
-"""
-User related functionality
-"""
-
+from src import Flask
 from src.models.base import Base
 
 
 class User(Base):
-    """User representation"""
-
     email: str
     first_name: str
     last_name: str
 
-    def __init__(self, email: str, first_name: str, last_name: str, **kw):
-        """Dummy init"""
+    def __init__(self, email: str, first_name: str, last_name: str, **kw) -> None:
         super().__init__(**kw)
         self.email = email
         self.first_name = first_name
         self.last_name = last_name
 
     def __repr__(self) -> str:
-        """Dummy repr"""
         return f"<User {self.id} ({self.email})>"
 
     def to_dict(self) -> dict:
-        """Dictionary representation of the object"""
         return {
             "id": self.id,
             "email": self.email,
@@ -36,8 +28,7 @@ class User(Base):
 
     @staticmethod
     def create(user: dict) -> "User":
-        """Create a new user"""
-        from src.persistence import repo
+        from src.persistence import db
 
         users: list["User"] = User.get_all()
 
@@ -47,14 +38,13 @@ class User(Base):
 
         new_user = User(**user)
 
-        repo.save(new_user)
+        db.save(new_user)
 
         return new_user
 
     @staticmethod
     def update(user_id: str, data: dict) -> "User | None":
-        """Update an existing user"""
-        from src.persistence import repo
+        from src.persistence import db
 
         user: User | None = User.get(user_id)
 
@@ -68,6 +58,6 @@ class User(Base):
         if "last_name" in data:
             user.last_name = data["last_name"]
 
-        repo.update(user)
+        db.update(user)
 
         return user
