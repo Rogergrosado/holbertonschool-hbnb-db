@@ -1,82 +1,70 @@
-"""
-This module exports configuration classes for the Flask application.
-
-- DevelopmentConfig
-- TestingConfig
-- ProductionConfig
-
-"""
-
-from abc import ABC
 import os
+from flask import Flask
+from flask_jwt_extended import JWTManager
+from flask_sqlalchemy import SQLAlchemy
+import sqlite3
+#Part of the the Flask_SQLAlchemy configuration
+basedir = os.path.abspath(os.path.dirname(__file__))
 
-
-class Config(ABC):
-    """
-    Initial configuration settings
-    This class should not be instantiated directly
-    """
-
+class Config:
     DEBUG = False
     TESTING = False
 
+    SECRET_KEY = os.getenv('SECRET_KEY', 'super-secret')
+    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'super-secret')
+
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite:///hbnb_dev.db")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
+
+# Development configuration inherits from Config
 class DevelopmentConfig(Config):
-    """
-    Development configuration settings
-    This configuration is used when running the application locally
+    DEBUG = True # Enable debug mode for development
+    TESTING = True # Enable testing mode for development
 
-    This is useful for development and debugging purposes.
+    # Development-specific database URI, defaults to SQLite if not set
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite:///development.db")
 
-    To check if the application is running in development mode, you can use:
-    ```
-    app = Flask(__name__)
+    #Path to the default SQLite database file.
+    db_file = 'holbertonschool-hbnb-db/src/persistence/SQLite_database.db'
+    #(temporary name, to be updated when definitive SQLite database created)
 
-    if app.debug:
-        # Do something
-    ```
-    """
-
-    SQLALCHEMY_DATABASE_URI = os.getenv(
-        "DATABASE_URL", "sqlite:///hbnb_dev.db")
-    DEBUG = True
-
-
-class TestingConfig(Config):
-    """
-    Testing configuration settings
-    This configuration is used when running tests.
-    You can enabled/disable things across the application
-
-    To check if the application is running in testing mode, you can use:
-    ```
-    app = Flask(__name__)
-
-    if app.testing:
-        # Do something
-    ```
-
-    """
-
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    # Check if the database exists, and if not creates it.
+    if not os.path.exists(db_file):
+        conn = sqlite3.connect(db_file)
+        cursor = conn.cursor()
+        cursor.execute
+        (
+        '''
+        CREATE TABLE IF NOT EXISTS users 
+            (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            email TEXT NOT NULL UNIQUE
+            )
+        '''
+        )
+        print("Database created successfully!")
+        conn.commit()
+        conn.close()
+    else:
+        print("SQLite database already exists.")
 
 
+# Production configuration inherits from Config
 class ProductionConfig(Config):
-    """
-    Production configuration settings
-    This configuration is used when you create a
-    production build of the application
-
-    The debug or testing options are disabled in this configuration.
-    """
-
-    TESTING = False
+    # Production database URI, defaults to PostgreSQL if DATABASE_URL is set, otherwise local SQLite
     DEBUG = False
+    TESTING = False 
 
+    # Initialize PostgreSQL database when 
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "DATABASE_URL",
         "postgresql://user:password@localhost/hbnb_prod"
     )
+
+app = Flask(__name__)
+# Switch to DevelopmentConfig mode or ProductionConfig mode depending on the environment variable
+app.config.from_object('config.DevelopmentConfig' if os.environ.get('ENV') == 'development' else 'config.ProductionConfig')
+db = SQLAlchemy(app)
