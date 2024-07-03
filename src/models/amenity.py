@@ -1,12 +1,16 @@
 from src.models.base import Base
+from flask_sqlalchemy import SQLAlchemy
 from src import db
+from sqlalchemy import Column, String, Integer, ForeignKey, DateTime
+from sqlalchemy.sql import func
+from datetime import datetime
 
-class Amenity(Base, db.Model):
+class Amenity(Base):
 
     __tablename__ = 'amenities'
 
     id = db.Column(db.String(36), primary_key=True)
-    place_id = db.Column(db.Integer, db.ForeignKey('places.id'), nullable=False)
+    place_id = db.Column(db.String(36), db.ForeignKey('places.id'), nullable=False)
     name = db.Column(db.String(50), nullable=True)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
@@ -55,8 +59,9 @@ class Amenity(Base, db.Model):
 
 
 class PlaceAmenity(Base):
-    place_id: str
-    amenity_id: str
+  
+    place_id = db.Column(db.String(36), db.ForeignKey('places.id'), nullable=False)
+    amenity_id = db.Column(db.String(36), db.ForeignKey('amenities.id'), nullable=False)
 
     def __init__(self, place_id: str, amenity_id: str, **kw) -> None:
         super().__init__(**kw)

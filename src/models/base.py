@@ -2,12 +2,17 @@ from datetime import datetime
 from typing import Any, Optional
 from uuid import uuid4
 from abc import ABC, abstractmethod
+from sqlalchemy import DateTime, String, Column
+from sqlalchemy.sql import func
+from src import db
 
+class Base(db.Model):
 
-class Base(ABC):
-    id: str
-    created_at: datetime
-    updated_at: datetime
+    __abstract__ = True
+    
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid4()))
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
     def __init__(
         self,

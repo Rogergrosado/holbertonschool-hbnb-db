@@ -1,10 +1,18 @@
 from src.models.base import Base
 from src.models.country import Country
+from src import db
+from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy.orm import relationship, backref
 
 
 class City(Base):
-    name: str
-    country_code: str
+    
+    __tablename__ = 'cities'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    country_code = db.Column(db.String(2), db.ForeignKey('countries.code'), nullable=False)
+    country = db.relationship('Country', backref=db.backref('cities', lazy=True))
 
     def __init__(self, name: str, country_code: str, **kw) -> None:
         super().__init__(**kw)
