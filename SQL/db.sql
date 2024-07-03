@@ -1,9 +1,3 @@
--- Create database
-CREATE DATABASE hbnb;
-
--- Use the database
-USE hbnb;
-
 -- Create Users table
 CREATE TABLE users (
     id INT PRIMARY KEY,
@@ -15,11 +9,6 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
--- Insert initial data into Users table
-INSERT INTO users (username, email, password, first_name, last_name) VALUES
-('host1', 'host1@example.com', 'password1', 'Host', 'One'),
-('guest1', 'guest1@example.com', 'password2', 'Guest', 'One');
 
 -- Create countries table
 CREATE TABLE countries (
@@ -37,44 +26,30 @@ CREATE TABLE cities (
     FOREIGN KEY (country_code) REFERENCES countries(code)
 );
 
-
 -- Create Places table
 CREATE TABLE places (
     id INT PRIMARY KEY,
-    host_id INT NOT NULL,
+    user_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
     address VARCHAR(255) NOT NULL,
     city_id INT NOT NULL,
-    country VARCHAR(100) NOT NULL,
+    country CHAR(2) NOT NULL,
     price_per_night DECIMAL(10, 2) NOT NULL,
     max_guests INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (host_id, city_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (city_id) REFERENCES cities(id)
 );
-
--- Insert initial data into Places table
-INSERT INTO places (host_id, title, description, address, city, country, price_per_night, max_guests) VALUES
-(1, 'Cozy Cottage', 'A cozy cottage in the countryside', '123 Country Lane', 'Countryside', 'USA', 100.00, 4),
-(1, 'Modern Apartment', 'A modern apartment in the city center', '456 City Street', 'Cityville', 'USA', 150.00, 2);
 
 -- Create Amenities table
 CREATE TABLE amenities (
-    id VARCHAR(36) PRIMARY KEY,
-    place_id VARCHAR(36) NOT NULL,
+    id INT PRIMARY KEY,
     name VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (place_id) REFERENCES places(id)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
--- Insert initial data into Amenities table
-INSERT INTO amenities (name) VALUES
-('WiFi'),
-('Air Conditioning'),
-('Kitchen'),
-('Parking');
 
 -- Create Place_Amenities table (for many-to-many relationship)
 CREATE TABLE place_amenities (
@@ -84,14 +59,6 @@ CREATE TABLE place_amenities (
     FOREIGN KEY (place_id) REFERENCES places(id),
     FOREIGN KEY (amenity_id) REFERENCES amenities(id)
 );
-
--- Insert initial data into Place_Amenities table
-INSERT INTO place_amenities (place_id, amenity_id) VALUES
-(1, 1), -- Cozy Cottage has WiFi
-(1, 3), -- Cozy Cottage has Kitchen
-(2, 1), -- Modern Apartment has WiFi
-(2, 2), -- Modern Apartment has Air Conditioning
-(2, 4); -- Modern Apartment has Parking
 
 -- Create Reviews table
 CREATE TABLE reviews (
@@ -105,7 +72,52 @@ CREATE TABLE reviews (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+-- Insert initial data into Users table
+INSERT INTO users (id, username, email, password, first_name, last_name)
+VALUES (1, 'johndoe', 'john@example.com', 'hashedpassword', 'John', 'Doe');
+
+-- Insert initial data into Countries table
+INSERT INTO countries (code, name)
+VALUES ('US', 'United States');
+
+-- Insert initial data into Cities table
+INSERT INTO cities (id, name, country_code)
+VALUES (1, 'New York', 'US');
+
+-- Insert initial data into Places table
+INSERT INTO places (id, user_id, title, description, address, city_id, country, price_per_night, max_guests)
+VALUES (1, 1, 'Cozy Apartment', 'A nice and cozy apartment in the city center.', '123 Main St', 1, 'US', 75.00, 2);
+
+-- Insert initial data into Amenities table
+INSERT INTO amenities (id, name)
+VALUES (1, 'Wi-Fi');
+
+-- Insert initial data into Place_Amenities table
+INSERT INTO place_amenities (place_id, amenity_id)
+VALUES (1, 1);
+
 -- Insert initial data into Reviews table
-INSERT INTO reviews (place_id, user_id, rating, comment) VALUES
-(1, 2, 5, 'Amazing stay! The cottage was cozy and comfortable.'),
-(2, 2, 4, 'Great location and amenities, but a bit noisy at night.');
+INSERT INTO reviews (id, place_id, user_id, rating, comment)
+VALUES (1, 1, 1, 5, 'Great place!');
+
+-- Display data from all tables
+SELECT 'Users' AS table_name;
+SELECT * FROM users;
+
+SELECT 'Countries' AS table_name;
+SELECT * FROM countries;
+
+SELECT 'Cities' AS table_name;
+SELECT * FROM cities;
+
+SELECT 'Places' AS table_name;
+SELECT * FROM places;
+
+SELECT 'Amenities' AS table_name;
+SELECT * FROM amenities;
+
+SELECT 'Place Amenities' AS table_name;
+SELECT * FROM place_amenities;
+
+SELECT 'Reviews' AS table_name;
+SELECT * FROM reviews;
