@@ -1,8 +1,9 @@
 """
 Countries controller module
 """
-
+ 
 from flask import abort
+from src.models.base import Base
 from src.models.city import City
 from src.models.country import Country
 
