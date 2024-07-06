@@ -1,6 +1,7 @@
 """ Populate the database with some data at the start of the application"""
 
 from src.persistence.repository import Repository
+from src.persistence.db import db
 
 
 def populate_db(repo: Repository) -> None:
@@ -12,6 +13,6 @@ def populate_db(repo: Repository) -> None:
     ]
 
     for country in countries:
-        repo.save(country)
+        db.save(country)
 
     print("Memory DB populated")
