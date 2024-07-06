@@ -1,7 +1,10 @@
 alembic
+config
 flask
 flask-cors
-flask-SQLAlchemy
+Flask-SQLAlchemy>=2.5
 gunicorn
+jwt
 python-dotenv
-SQLAlchemy
+requests
+SQLAlchemy>=1.4
