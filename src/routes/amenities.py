@@ -3,6 +3,7 @@ This module contains the routes for the amenities blueprint
 """
 
 from flask import Blueprint
+from flask_jwt_extended import jwt_required
 from src.controllers.amenities import (
     create_amenity,
     delete_amenity,
